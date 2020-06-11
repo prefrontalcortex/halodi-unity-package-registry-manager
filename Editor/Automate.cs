@@ -10,13 +10,14 @@ public class Automate : MonoBehaviour
     static void Aut()
     {
         var controller = new RegistryManagerController();
-        var reg = new ScopedRegistry();
+        var registry = new ScopedRegistry();
+        var credentialManager = new CredentialManager();
 
-        reg.name = "needle-github"; 
-        reg.url = "https://npm.pkg.github.com/@needle-tools";
-        reg.scopes = new string[] { "com.needle" };
+        registry.name = "needle-github"; 
+        registry.url = "https://npm.pkg.github.com/@needle-tools";
+        registry.scopes = new string[] { "com.needle" };
 
-        UpdateCredential(controller, reg);
+        UpdateCredential(controller, registry);
 
         // URL to generate tokens
         // https://github.com/settings/tokens
@@ -24,9 +25,16 @@ public class Automate : MonoBehaviour
         // Felix' token - read:packages
         var githubToken = "da48fccfde6413ccd9ddfb7377a9a5df865eb7cc";
 
-        reg.token = githubToken;
+        registry.token = githubToken;
+        registry.auth = true;
+
+        // Save
+        if(!string.IsNullOrEmpty(registry.token))
+            credentialManager.SetCredential(registry.url, registry.auth, registry.token);
+        else
+            credentialManager.RemoveCredential(registry.url);
         
-        controller.Save(reg);
+        controller.Save(registry);
     }
 
     private static void UpdateCredential(RegistryManagerController controller, ScopedRegistry registry)
